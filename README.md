@@ -1,6 +1,6 @@
-[//]: # (TODO Replace with relevant title.)
+[//]: # (DONE Replace with relevant title.)
 
-# Android project template
+# Notes Application
 
 ## Summary
 
@@ -10,13 +10,11 @@ This is a project template for all phases&mdash;from proposal to final delivery&
 
 ## Credits, copyrights, and license information
 
-[//]: # (TODO Include authorship credits and copyright info.)
+[//]: # (DONE Include authorship credits and copyright info.)
 
-Written by Nicholas Bennett and Todd Nordquist.
+&copy; 2025 Tim Nickell.
 
-&copy; 2025 CNM Ingenuity, Inc.
-
-[//]: # (TODO Include relevant license info.)
+[//]: # (DONE Include relevant license info.)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

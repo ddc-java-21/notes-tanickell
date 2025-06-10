@@ -30,7 +30,7 @@ dependencyResolutionManagement {
     }
 }
 
-// TODO Replace with suitable project name.
-rootProject.name = "android-project-template"
+// DONE Replace with suitable project name.
+rootProject.name = "notes"
 
 include(":app")
