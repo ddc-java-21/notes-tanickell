@@ -4,6 +4,15 @@ import java.time.Instant;
 
 public class Note {
 
+    /*
+  C - Create a new note instance when the app user adds/starts a new note.
+  R - Retrieve all note instances for a user and display them in some order (e.g. descending by last modified).
+  R - Retrieve a single note instance and display its details (title, contents, etc.) in an editor window.
+  U - Update a note instance when author chooses to edit a note's contents or change its title.
+  D - Delete a note when a user chooses to remove a note from their inventory.
+  D - Bulk remove note instances when group selected from list screen by author.
+   */
+
   private long id;
   private String title;
   private String description;

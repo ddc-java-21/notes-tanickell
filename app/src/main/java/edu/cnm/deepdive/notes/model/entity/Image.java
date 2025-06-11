@@ -12,6 +12,16 @@ public class Image {
   D - Remove an image from a note
    */
 
+    /*
+  C - Create a new note instance when a user first attaches an image to a note.
+  R - Retrieve all images for a note and display them in a grid view or gallery (a la reddit?).
+  R - Retrieve a single image for display when a user clicks the image (e.g., take them to the gallery app, or have a dedicated viewer?).
+  U - Update the caption for the image instance when the user chooses to edit the caption (from the note editor view).
+  D - Delete the image instance when the user removes the image from a note.
+  D - Delete multiple images (instances) from a note when a user mass selects and removes from a note.
+  D - Delete multiple collections when a user deletes multiple notes (taken care of in the note class?).
+   */
+
   private long id;
   private String caption;
   private String mimeType;
