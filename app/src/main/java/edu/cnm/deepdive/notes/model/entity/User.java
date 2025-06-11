@@ -1,7 +1,18 @@
 package edu.cnm.deepdive.notes.model.entity;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
 import java.time.Instant;
 
+@Entity(
+    tableName = "user",
+    indices = {
+        @Index(value = "oauth_key", unique = true),
+        @Index(value = "display_name", unique = true)
+    }
+)
 public class User {
 
     /* CRUD Operations:
@@ -11,9 +22,16 @@ public class User {
   D - Not Applicable (but we may make an account dormant, rather than allow its removal).
    */
 
+  @PrimaryKey(autoGenerate = true)
+  @ColumnInfo(name = "user_id")
   private long id;
+
+  @ColumnInfo(name = "oauth_key")
   private String oauthKey;
+
+  @ColumnInfo(name = "display_name", collate = ColumnInfo.NOCASE)
   private String displayName;
+
   private Instant created;
 
   public long getId() {

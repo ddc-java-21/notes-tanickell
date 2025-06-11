@@ -1,7 +1,22 @@
 package edu.cnm.deepdive.notes.model.entity;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 import java.time.Instant;
 
+@Entity(
+    tableName = "note",
+    foreignKeys = {
+        @ForeignKey(
+            entity = User.class,
+            parentColumns = "user_id",
+            childColumns = "user_id",
+            onDelete = ForeignKey.CASCADE
+        )
+    }
+)
 public class Note {
 
     /*
@@ -13,11 +28,22 @@ public class Note {
   D - Bulk remove note instances when group selected from list screen by author.
    */
 
+  @PrimaryKey(autoGenerate = true)
+  @ColumnInfo(name = "note_id")
   private long id;
+
+  @ColumnInfo(collate = ColumnInfo.NOCASE, index = true)
   private String title;
+
   private String description;
+
+  @ColumnInfo(index = true)
   private Instant created;
+
+  @ColumnInfo(index = true)
   private Instant modified;
+
+  @ColumnInfo(name = "user_id", index = true)
   private long userId;
 
   public long getId() {
