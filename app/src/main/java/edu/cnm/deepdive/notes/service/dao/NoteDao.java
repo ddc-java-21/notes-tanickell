@@ -32,7 +32,7 @@ public interface NoteDao {
   default Single<Note> updateTimestampAndSave(Note note) {
     return Single.just(note)
         .map((n) -> {
-          n.setModified(n.getModified());
+          n.setModified(Instant.now());
           return n;
         })
         .flatMap(this::update)
