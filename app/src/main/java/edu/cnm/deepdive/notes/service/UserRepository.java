@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -17,7 +18,7 @@ public class UserRepository {
   private final Scheduler scheduler;
 
   @Inject
-  UserRepository(UserDao userDao) { // package-private: don't want it to be part of API, won't be included in java docs (no documentation for package-private)
+  UserRepository(UserDao userDao) { // package-private: don't want it to be part of API, won't be included in Javadocs (no documentation for package-private)
     this.userDao = userDao;
     scheduler = Schedulers.io(); // utility class that returns a scheduler
   }
@@ -26,14 +27,13 @@ public class UserRepository {
     return (
         (user.getId() == 0)
         ? userDao.insertAndGet(user)
-        : userDao.update(user)
-            .andThen(Single.just(user))
+        : userDao.updateTimestampAndSave(user)
     )
         .subscribeOn(scheduler);
   }
 
   public LiveData<User> get(long userId) { // delegate this to the dao
-    userDao.select(userId);
+    return userDao.select(userId);
   }
 
   public Completable remove(User user) {
@@ -41,5 +41,11 @@ public class UserRepository {
         .delete(user)
         .subscribeOn(scheduler); // attach to thread
   }
+
+  public LiveData<List<User>> getAll() {
+    return userDao.select();
+  }
+
+
 
 }
