@@ -1,16 +1,23 @@
 package edu.cnm.deepdive.notes.controller;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
+import com.google.android.material.snackbar.Snackbar;
+import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.databinding.FragmentDetailsBinding;
-import edu.cnm.deepdive.notes.model.entity.Note;
 import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel;
 
@@ -22,6 +29,14 @@ public class DetailsFragment extends Fragment {
   private NoteViewModel viewModel;
   private long noteId;
   private NoteWithImages note;
+  private ActivityResultLauncher<String> requestCameraPermissionLauncher =
+    registerForActivityResult(new ActivityResultContracts.RequestPermission(), (granted) -> {
+      if (granted) {
+        // TODO: 6/17/25 Make camera capture control visible.
+      } else {
+        // TODO: 6/17/25 Make camera capture control GONE!
+      }
+    });
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +69,7 @@ public class DetailsFragment extends Fragment {
     } else {
       note = new NoteWithImages();
     }
+    checkCameraPermission();
   }
 
   @Override
@@ -61,4 +77,38 @@ public class DetailsFragment extends Fragment {
     binding = null;
     super.onDestroyView();
   }
+  
+  private void checkCameraPermission() {
+    if (!hasCameraPermission()) {
+      if (shouldExplainCameraPermission()) {
+        // DONE: 6/17/25 Display dialog fragment (or snackbar) with text explaining use of camera by app.
+        explainCameraPermission();
+      } else {
+        requestCameraPermission();
+      }
+    } else {
+      // TODO: 6/17/25 Make camera capture control visible.
+    }
+  }
+
+  private void requestCameraPermission() {
+    requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+  }
+
+  private boolean hasCameraPermission() {
+    return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+        == PackageManager.PERMISSION_GRANTED; // need Activity's involvement to ask for permissions from Fragment
+  }
+  
+  private boolean shouldExplainCameraPermission() {
+    return ActivityCompat
+        .shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.CAMERA);
+  }
+
+  private void explainCameraPermission() {
+    Snackbar.make(binding.getRoot(), R.string.camera_permission_explanation, Snackbar.LENGTH_INDEFINITE)
+        .setAction(android.R.string.ok, (v) -> requestCameraPermission())
+        .show();
+  }
+  
 }
