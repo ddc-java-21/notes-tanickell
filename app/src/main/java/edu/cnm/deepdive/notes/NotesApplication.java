@@ -17,6 +17,11 @@ package edu.cnm.deepdive.notes;
 
 import android.app.Application;
 import dagger.hilt.android.HiltAndroidApp;
+import edu.cnm.deepdive.notes.service.dao.ImageDao;
+import edu.cnm.deepdive.notes.service.dao.NoteDao;
+import edu.cnm.deepdive.notes.service.dao.UserDao;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import javax.inject.Inject;
 
 /**
  * Initializes (in the {@link #onCreate()} method) application-level resources that cannot be
