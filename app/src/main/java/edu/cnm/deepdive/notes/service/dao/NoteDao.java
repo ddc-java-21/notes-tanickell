@@ -9,6 +9,7 @@ import androidx.room.Update;
 import edu.cnm.deepdive.notes.model.entity.Note;
 import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.List;
 
 @Dao
@@ -29,6 +30,35 @@ public interface NoteDao {
         .doOnSuccess(note::setId)
         .map((id) -> note);
   }
+
+
+
+  @Insert
+  Single<List<Long>> _insert(List<Note> notes);
+
+  default Single<List<Note>> insert(List<Note> notes) {
+    return Single
+        .just(notes)
+        .doOnSuccess((ns) -> {
+          Instant now = Instant.now();
+          ns.forEach((n) -> {
+            n.setCreated(now);
+            n.setModified(now);
+          });
+        })
+        //.flatMap((updatedNotes) -> _insert(updatedNotes))
+        .flatMap(this::_insert)
+        .doOnSuccess((ids) -> {
+          Iterator<Long> idIterator = ids.iterator();
+          Iterator<Note> noteIterator = notes.iterator();
+          while (idIterator.hasNext() && noteIterator.hasNext()) {
+            noteIterator.next().setId(idIterator.next());
+          }
+        })
+        .map((ids) -> notes);
+  }
+
+
 
   @Update
   Single<Integer> _update(Note note);
