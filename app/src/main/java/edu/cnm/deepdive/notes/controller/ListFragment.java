@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import dagger.hilt.android.AndroidEntryPoint;
 import edu.cnm.deepdive.notes.databinding.FragmentListBinding;
 import edu.cnm.deepdive.notes.view.adapter.NoteAdapter;
@@ -37,6 +38,8 @@ public class ListFragment extends Fragment implements MenuProvider {
     // DONE: 6/16/25 Inflate layout using a binding class, and return the root view of the layout.
     binding = FragmentListBinding.inflate(inflater, container, false);
     binding.notes.setAdapter(adapter);
+    adapter.setListener((note, position) -> Navigation.findNavController(binding.getRoot())
+        .navigate(ListFragmentDirections.showDetails(note.getId())));
     return binding.getRoot();
   }
 

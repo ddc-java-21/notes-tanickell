@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import edu.cnm.deepdive.notes.model.entity.Note;
+import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import edu.cnm.deepdive.notes.service.NoteRepository;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -25,7 +26,7 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   private final Context context;
   private final NoteRepository repository;
   private final MutableLiveData<Long> noteId;
-  private final LiveData<Note> note;
+  private final LiveData<NoteWithImages> note;
   private final MutableLiveData<Throwable> throwable;
   private final CompositeDisposable pending; // composite disposable = zero or more disposables collected in one bucket
 
@@ -48,15 +49,15 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
     this.noteId.setValue(noteId); // connect one piece of live data to another
   }
 
-  public LiveData<List<Note>> getNotes() {
+  public LiveData<List<NoteWithImages>> getNotes() {
     return repository.getAll();
   }
 
-  public LiveData<Note> getNote() {
+  public LiveData<NoteWithImages> getNote() {
     return note;
   }
 
-  public void save(Note note) {
+  public void save(NoteWithImages note) {
     throwable.setValue(null);
     repository
         .save(note)
@@ -68,7 +69,7 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
         );
   }
 
-  public void delete(Note note) {
+  public void remove(Note note) {
     throwable.setValue(null);
     repository
         .remove(note)

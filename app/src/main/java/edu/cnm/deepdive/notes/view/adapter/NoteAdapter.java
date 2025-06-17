@@ -11,8 +11,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import dagger.hilt.android.qualifiers.ActivityContext;
 import dagger.hilt.android.scopes.FragmentScoped;
 import edu.cnm.deepdive.notes.databinding.ItemNoteBinding;
-import edu.cnm.deepdive.notes.model.entity.Note;
-import java.time.LocalDateTime;
+import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,15 +23,18 @@ import javax.inject.Inject;
 @FragmentScoped
 public class NoteAdapter extends Adapter<ViewHolder> {
 
-  private final List<Note> notes;
+  private final List<NoteWithImages> notes;
   private final LayoutInflater inflater;
   private final DateTimeFormatter formatter;
+
+  private OnNoteClickListener listener; // can't pass in constructor
 
   @Inject
   NoteAdapter(@ActivityContext Context context) {
     notes = new ArrayList<>();
     inflater = LayoutInflater.from(context);
     formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+    listener = (note, position) -> {}; // does nothing, but allows us to not check for null below
   }
 
 
@@ -42,7 +44,7 @@ public class NoteAdapter extends Adapter<ViewHolder> {
     // DONE: 6/16/25 Inflate the itemLayout and pass it to the Holder constructor, then return the
     //  new Holder.
     ItemNoteBinding binding = ItemNoteBinding.inflate(inflater, container, false);
-    return new Holder(binding, formatter);
+    return new Holder(binding, formatter, listener);
   }
 
   @Override
@@ -58,26 +60,35 @@ public class NoteAdapter extends Adapter<ViewHolder> {
   }
 
   @SuppressLint("NotifyDataSetChanged")
-  public void setNotes(List<Note> notes) {
+  public void setNotes(List<NoteWithImages> notes) {
     this.notes.clear();
     this.notes.addAll(notes);
     notifyDataSetChanged(); // TODO: 6/16/25 Investigate retaining scroll position.
+  }
+
+  public NoteAdapter setListener(@NonNull OnNoteClickListener listener) {
+    this.listener = listener;
+    return this;
   }
 
   private static class Holder extends ViewHolder {
 
     private final ItemNoteBinding binding;
     private final DateTimeFormatter formatter;
-    Holder (@NonNull ItemNoteBinding binding, @NonNull DateTimeFormatter formatter) {
+    private final OnNoteClickListener listener;
+
+    Holder (@NonNull ItemNoteBinding binding, @NonNull DateTimeFormatter formatter,
+        @NonNull OnNoteClickListener listener) {
       super(binding.getRoot());
       this.binding = binding;
       this.formatter = formatter;
+      this.listener = listener;
     }
 
     // DONE: 6/16/25 Define bind method to take a specified Note and insert its contents into the
     //  widgets referenced by the binding object.
 
-    void bind(int position, Note note) {
+    void bind(int position, NoteWithImages note) {
       // DONE: 6/16/25 Set contents of binding fields to hold contents of note; attach event
       //  listeners to binding.getRoot().
       binding.title.setText(note.getTitle());
@@ -90,8 +101,16 @@ public class NoteAdapter extends Adapter<ViewHolder> {
       );
       binding.thumbnail.setVisibility(View.GONE);
       // TODO: 6/17/25 Display thumbnail.
-      // TODO: 6/17/25 Attach click listener.
+      // DONE: 6/17/25 Attach click listener.
+      binding
+          .getRoot()
+          .setOnClickListener((v) -> listener.onNoteClick(note, position));
     }
+
+  }
+
+  public interface OnNoteClickListener {
+    void onNoteClick(NoteWithImages note, int position);
 
   }
 
