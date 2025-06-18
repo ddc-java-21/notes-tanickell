@@ -5,4 +5,8 @@
   <string name="details_fragment_label">Note Details</string>
   <string name="camera_permission_explanation">If permission to use camera is granted, images can be captured and attached to notes.</string>
   <string name="capture_directory">captures</string>
+  <string name="edit_note_description">Edit Note</string>
+  <string name="add_photo_description">Add Photo</string>
+  <string name="save_changes_description">Save Changes</string>
+  <string name="cancel_changes_description">Cancel Changes</string>
 </resources>
