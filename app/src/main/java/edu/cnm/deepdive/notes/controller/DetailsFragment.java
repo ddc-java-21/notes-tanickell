@@ -26,6 +26,7 @@ import edu.cnm.deepdive.notes.model.entity.Image;
 import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import edu.cnm.deepdive.notes.service.ImageFileProvider;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel;
+import edu.cnm.deepdive.notes.viewmodel.NoteViewModel.VisibilityFlags;
 import java.io.File;
 import java.util.UUID;
 
@@ -41,18 +42,12 @@ public class DetailsFragment extends Fragment {
   private NoteWithImages note;
   private ActivityResultLauncher<String> requestCameraPermissionLauncher;
   private ActivityResultLauncher<Uri> takePictureLauncher;
-  private boolean cameraPermissionGranted;
-
 
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     noteId = DetailsFragmentArgs.fromBundle(getArguments()).getNoteId();
-    requestCameraPermissionLauncher =
-        registerForActivityResult(new ActivityResultContracts.RequestPermission(), (granted) -> cameraPermissionGranted = granted);
-          // DONE: 6/17/25 Make camera capture control GONE!
-         // DONE: 6/17/25 Make camera capture control visible.
   }
 
   @Nullable
@@ -91,19 +86,26 @@ public class DetailsFragment extends Fragment {
         .getCaptureUri()
         .observe(owner, this::handleCaptureUri);
     viewModel
-        .getEditing()
-        .observe(owner, this::handleEditing);
+        .getVisibilityFlags()
+        .observe(owner, this::handleVisibilityFlags);
+    requestCameraPermissionLauncher = registerForActivityResult(
+        new ActivityResultContracts.RequestPermission(),
+        viewModel::setCameraPermission);       // DONE: 6/17/25 Make camera capture control GONE!          // DONE: 6/17/25 Make camera capture control visible.
     takePictureLauncher = registerForActivityResult(new TakePicture(), viewModel::confirmCapture); // method reference ok here bc we know viewModel won't be null; intellij doesn't know this
     checkCameraPermission();
   }
 
-  private void handleEditing(Boolean editing) {
-    if (editing) {
+  private void handleVisibilityFlags(VisibilityFlags flags) {
+    if (flags.editing()) {
+      binding.staticContent.setVisibility(View.GONE);
+      binding.editableContent.setVisibility(View.VISIBLE);
       binding.edit.setVisibility(View.GONE);
-      binding.addPhoto.setVisibility(cameraPermissionGranted ? View.VISIBLE : View.GONE);// DONE: 6/18/25 Update take photo button visibility and/or enabled state as appropriate.
+      binding.addPhoto.setVisibility(flags.cameraPermission() ? View.VISIBLE : View.GONE);// DONE: 6/18/25 Update take photo button visibility and/or enabled state as appropriate.
       binding.save.setVisibility(View.VISIBLE);
       binding.cancel.setVisibility(View.VISIBLE);
     } else {
+      binding.staticContent.setVisibility(View.VISIBLE);
+      binding.editableContent.setVisibility(View.GONE);
       binding.edit.setVisibility(View.VISIBLE);
       binding.addPhoto.setVisibility(View.GONE); // DONE: 6/18/25 Update take photo button visibility and/or enabled state as appropriate.
       binding.save.setVisibility(View.GONE);
@@ -119,7 +121,11 @@ public class DetailsFragment extends Fragment {
 
   private void handleNote(NoteWithImages note) {
     this.note = note;
-    // TODO: 6/17/25 Set contents of view widgets based on note.
+    // DONE: 6/17/25 Set contents of view widgets based on note.
+    binding.titleStatic.setText(note.getTitle());
+    binding.titleEditable.setText(note.getTitle());
+    binding.descriptionStatic.setText(note.getDescription());
+    binding.descriptionEditable.setText(note.getDescription());
   }
 
   @Override
@@ -137,7 +143,7 @@ public class DetailsFragment extends Fragment {
         requestCameraPermission();
       }
     } else {
-      cameraPermissionGranted = true; // DONE: 6/17/25 Make camera capture control visible.
+      viewModel.setCameraPermission(true); // DONE: 6/17/25 Make camera capture control visible.
     }
   }
 
