@@ -13,11 +13,15 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import edu.cnm.deepdive.notes.model.entity.Image;
 import edu.cnm.deepdive.notes.model.entity.Note;
 import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import edu.cnm.deepdive.notes.service.NoteRepository;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import kotlin.jvm.functions.Function1;
@@ -29,6 +33,7 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   private final NoteRepository repository;
   private final MutableLiveData<Long> noteId;
   private final LiveData<NoteWithImages> note;
+  private final MutableLiveData<List<Image>> images;
   private final MutableLiveData<Uri> captureUri;
   private final MutableLiveData<Boolean> editing;
   private final MutableLiveData<Boolean> cameraPermission;
@@ -46,6 +51,13 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
     this.repository = repository;
     noteId = new MutableLiveData<>();
     note = Transformations.switchMap(noteId, repository::get);
+    images = new MutableLiveData<>(new ArrayList<>());
+    note.observeForever((note) -> {
+      List<Image> images = this.images.getValue(); // get a reference to the images, not a copy
+      images.clear();
+      images.addAll(note.getImages());
+      this.images.setValue(images); // when we put the exact same object back into live data, we trigger the observer
+    });
     captureUri = new MutableLiveData<>();
     editing = new MutableLiveData<>(false);
     cameraPermission = new MutableLiveData<>(false);
@@ -72,6 +84,24 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
 
   public LiveData<NoteWithImages> getNote() {
     return note;
+  }
+
+  public LiveData<List<Image>> getImages() {
+    return images;
+  }
+
+  public void addImage(Image image) {
+    List<Image> images = this.images.getValue();
+    //noinspection DataFlowIssue
+    images.add(image); // since we put an empty arraylist inside, it is not null
+    this.images.setValue(images);
+  }
+
+  public void removeImage(Image image) {
+    List<Image> images = this.images.getValue();
+    //noinspection DataFlowIssue
+    images.remove(image); // since we put an empty arraylist inside, it is not null
+    this.images.setValue(images);
   }
 
   public LiveData<Uri> getCaptureUri() {
@@ -103,17 +133,34 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   }
 
   public void confirmCapture(boolean success) {
-    captureUri.setValue(success ? pendingCaptureUri : null);
+    if (success) {
+      captureUri.setValue(pendingCaptureUri);
+      Image image = new Image();
+      image.setUri(pendingCaptureUri);
+      addImage(image);
+    } else {
+      captureUri.setValue(null);
+    }
     pendingCaptureUri = null;
   }
 
   public void save(NoteWithImages note) {
     throwable.setValue(null);
+    //noinspection DataFlowIssue
+    Single.just(note)
+        .doOnSuccess((n) -> n.getImages().clear())
+        .doOnSuccess((n) -> n.getImages().addAll(images.getValue()))
+        .flatMap(repository::save)
+        .subscribe(
+            (n) -> noteId.postValue(n.getId()),
+            this::postThrowable,
+            pending
+        );
     repository
         .save(note)
-//        .ignoreElement()
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
-            (n) -> {}, // remove n here if you uncomment two lines above
+            (n) -> noteId.setValue(n.getId()), // use postValue bc it works on any thread; setValue only works on UI thread, and data is currently in a background thread
             this::postThrowable,
             pending
         );
