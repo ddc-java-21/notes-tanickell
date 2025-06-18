@@ -25,6 +25,7 @@ import edu.cnm.deepdive.notes.databinding.FragmentDetailsBinding;
 import edu.cnm.deepdive.notes.model.entity.Image;
 import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import edu.cnm.deepdive.notes.service.ImageFileProvider;
+import edu.cnm.deepdive.notes.view.adapter.ImageAdapter;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel.VisibilityFlags;
 import java.io.File;
@@ -94,8 +95,11 @@ public class DetailsFragment extends Fragment {
       viewModel.setEditing(true);
     }
     viewModel
-        .getCaptureUri()
-        .observe(owner, this::handleCaptureUri);
+        .getImages()
+        .observe(owner, (images) -> {
+          ImageAdapter adapter = new ImageAdapter(requireContext(), images);
+          binding.images.setAdapter(adapter);
+        });
     viewModel
         .getVisibilityFlags()
         .observe(owner, this::handleVisibilityFlags);
@@ -122,12 +126,6 @@ public class DetailsFragment extends Fragment {
       binding.save.setVisibility(View.GONE);
       binding.cancel.setVisibility(View.GONE);
     }
-  }
-
-  private void handleCaptureUri(Uri uri) {
-    Image image = new Image();
-    image.setUri(uri);
-    note.getImages().add(image);
   }
 
   private void handleNote(NoteWithImages note) {
