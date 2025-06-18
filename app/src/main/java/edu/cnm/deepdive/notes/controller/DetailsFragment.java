@@ -34,20 +34,14 @@ public class DetailsFragment extends Fragment {
   private static final String TAG = DetailsFragment.class.getSimpleName();
   private static final String AUTHORITY = ImageFileProvider.class.getName().toLowerCase();   // DONE: 6/18/25 Use our provider to get the authority.
 
-  private final ActivityResultLauncher<String> requestCameraPermissionLauncher =
-      registerForActivityResult(new ActivityResultContracts.RequestPermission(), (granted) -> {
-        if (granted) {
-          // TODO: 6/17/25 Make camera capture control visible.
-        } else {
-          // TODO: 6/17/25 Make camera capture control GONE!
-        }
-      });
 
   private FragmentDetailsBinding binding;   // DONE: 6/17/25 Define binding instance.
   private NoteViewModel viewModel;
   private long noteId;
   private NoteWithImages note;
+  private ActivityResultLauncher<String> requestCameraPermissionLauncher;
   private ActivityResultLauncher<Uri> takePictureLauncher;
+  private boolean cameraPermissionGranted;
 
 
 
@@ -55,6 +49,10 @@ public class DetailsFragment extends Fragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     noteId = DetailsFragmentArgs.fromBundle(getArguments()).getNoteId();
+    requestCameraPermissionLauncher =
+        registerForActivityResult(new ActivityResultContracts.RequestPermission(), (granted) -> cameraPermissionGranted = granted);
+          // DONE: 6/17/25 Make camera capture control GONE!
+         // DONE: 6/17/25 Make camera capture control visible.
   }
 
   @Nullable
@@ -62,6 +60,16 @@ public class DetailsFragment extends Fragment {
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     binding = FragmentDetailsBinding.inflate(inflater, container, false);
+    binding.edit.setOnClickListener((v) -> viewModel.setEditing(true));
+    binding.save.setOnClickListener((v) -> {
+      // TODO: 6/18/25 Update note field and invoke save method in viewModel.
+      viewModel.setEditing(false);
+    });
+    binding.cancel.setOnClickListener((v) -> {
+      // TODO: 6/18/25 Discard changes, return note field to its original state.
+      viewModel.setEditing(false);
+    });
+    binding.addPhoto.setOnClickListener((v) -> capture());
     return binding.getRoot();
   }
 
@@ -75,22 +83,43 @@ public class DetailsFragment extends Fragment {
       viewModel.setNoteId(noteId);
       viewModel
           .getNote()
-          .observe(owner, (note) -> {
-            this.note = note;
-            // TODO: 6/17/25 Set contents of view widgets based on note.
-          });
+          .observe(owner, this::handleNote);
     } else {
       note = new NoteWithImages();
     }
     viewModel
         .getCaptureUri()
-        .observe(owner, (uri) -> {
-          Image image = new Image();
-          image.setUri(uri);
-          note.getImages().add(image);
-        });
+        .observe(owner, this::handleCaptureUri);
+    viewModel
+        .getEditing()
+        .observe(owner, this::handleEditing);
     takePictureLauncher = registerForActivityResult(new TakePicture(), viewModel::confirmCapture); // method reference ok here bc we know viewModel won't be null; intellij doesn't know this
     checkCameraPermission();
+  }
+
+  private void handleEditing(Boolean editing) {
+    if (editing) {
+      binding.edit.setVisibility(View.GONE);
+      binding.addPhoto.setVisibility(cameraPermissionGranted ? View.VISIBLE : View.GONE);// DONE: 6/18/25 Update take photo button visibility and/or enabled state as appropriate.
+      binding.save.setVisibility(View.VISIBLE);
+      binding.cancel.setVisibility(View.VISIBLE);
+    } else {
+      binding.edit.setVisibility(View.VISIBLE);
+      binding.addPhoto.setVisibility(View.GONE); // DONE: 6/18/25 Update take photo button visibility and/or enabled state as appropriate.
+      binding.save.setVisibility(View.GONE);
+      binding.cancel.setVisibility(View.GONE);
+    }
+  }
+
+  private void handleCaptureUri(Uri uri) {
+    Image image = new Image();
+    image.setUri(uri);
+    note.getImages().add(image);
+  }
+
+  private void handleNote(NoteWithImages note) {
+    this.note = note;
+    // TODO: 6/17/25 Set contents of view widgets based on note.
   }
 
   @Override
@@ -108,7 +137,7 @@ public class DetailsFragment extends Fragment {
         requestCameraPermission();
       }
     } else {
-      // TODO: 6/17/25 Make camera capture control visible.
+      cameraPermissionGranted = true; // DONE: 6/17/25 Make camera capture control visible.
     }
   }
 
@@ -145,5 +174,5 @@ public class DetailsFragment extends Fragment {
     viewModel.setPendingCaptureUri(uri);
     takePictureLauncher.launch(uri);
   }
-  
+
 }
