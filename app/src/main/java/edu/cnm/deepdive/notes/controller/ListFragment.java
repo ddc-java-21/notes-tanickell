@@ -17,6 +17,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import dagger.hilt.android.AndroidEntryPoint;
+import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.databinding.FragmentListBinding;
 import edu.cnm.deepdive.notes.view.adapter.NoteAdapter;
 import edu.cnm.deepdive.notes.viewmodel.LoginViewModel;
@@ -31,6 +32,7 @@ public class ListFragment extends Fragment implements MenuProvider {
 
   private FragmentListBinding binding;
   private NoteViewModel viewModel; // DONE: 6/16/25 Create a field for NoteViewModel.
+  private LoginViewModel loginViewModel;
 
   @Nullable
   @Override
@@ -56,7 +58,7 @@ public class ListFragment extends Fragment implements MenuProvider {
     viewModel
         .getNotes()
         .observe(owner, adapter::setNotes);
-    LoginViewModel loginViewModel = provider.get(LoginViewModel.class);
+    loginViewModel = provider.get(LoginViewModel.class);
     loginViewModel
         .getAccount()
             .observe(owner, (account) -> {
@@ -65,25 +67,31 @@ public class ListFragment extends Fragment implements MenuProvider {
                     .navigate(ListFragmentDirections.showPreLogin());
               }
             });
+    viewModel.fetchUser();
     activity.addMenuProvider(this, owner, State.RESUMED);
   }
 
   @Override
   public void onDestroyView() {
-    // DONE: 6/16/25 Set binding field to null.
-    binding = null;
+    binding = null; // DONE: 6/16/25 Set binding field to null.
     super.onDestroyView();
   }
 
   @Override
   public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-    // TODO: 6/16/25 Inflate a menu resource, attaching the inflated items to the specified menu.
+    menuInflater.inflate(R.menu.note_options, menu); // DONE: 6/16/25 Inflate a menu resource, attaching the inflated items to the specified menu.
   }
 
   @Override
   public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-    // TODO: 6/16/25 Check the ID of menuItem, to see if it is of interest to us; if so, perform
+    // DONE: 6/16/25 Check the ID of menuItem, to see if it is of interest to us; if so, perform
     //  appropriate operations and return true; otherwise, return false.
-    return false;
+    boolean handled = false;
+    if (menuItem.getItemId() == R.id.sign_out) {
+      loginViewModel.signOut();
+      handled = true;
+    }
+    return handled;
   }
+
 }
