@@ -172,6 +172,9 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
     DefaultLifecycleObserver.super.onStop(owner);
   }
 
+  public record VisibilityFlags(boolean editing, boolean cameraPermission) {
+  }
+
   @NonNull
   private LiveData<NoteWithImages> setupNoteWithImages() {
     LiveData<NoteWithImages> note = Transformations.switchMap(noteId, repository::get);
@@ -202,9 +205,6 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   private void postThrowable(Throwable throwable) {
     Log.e(NoteViewModel.class.getSimpleName(), throwable.getMessage(), throwable); // throwable itself puts the stack trace in
     this.throwable.postValue(throwable);
-  }
-
-  public record VisibilityFlags(boolean editing, boolean cameraPermission) {
   }
 
 }
