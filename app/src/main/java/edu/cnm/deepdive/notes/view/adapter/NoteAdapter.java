@@ -66,9 +66,8 @@ public class NoteAdapter extends Adapter<ViewHolder> {
     notifyDataSetChanged(); // TODO: 6/16/25 Investigate retaining scroll position.
   }
 
-  public NoteAdapter setListener(@NonNull OnNoteClickListener listener) {
+  public void setListener(@NonNull OnNoteClickListener listener) {
     this.listener = listener;
-    return this;
   }
 
   private static class Holder extends ViewHolder {

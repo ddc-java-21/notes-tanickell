@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.databinding.FragmentDetailsBinding;
-import edu.cnm.deepdive.notes.model.entity.Image;
 import edu.cnm.deepdive.notes.model.pojo.NoteWithImages;
 import edu.cnm.deepdive.notes.service.ImageFileProvider;
 import edu.cnm.deepdive.notes.view.adapter.ImageAdapter;
@@ -33,9 +32,9 @@ import java.util.UUID;
 
 public class DetailsFragment extends Fragment {
 
+  /** @noinspection unused*/
   private static final String TAG = DetailsFragment.class.getSimpleName();
   private static final String AUTHORITY = ImageFileProvider.class.getName().toLowerCase();   // DONE: 6/18/25 Use our provider to get the authority.
-
 
   private FragmentDetailsBinding binding;   // DONE: 6/17/25 Define binding instance.
   private NoteViewModel viewModel;
@@ -44,13 +43,13 @@ public class DetailsFragment extends Fragment {
   private ActivityResultLauncher<String> requestCameraPermissionLauncher;
   private ActivityResultLauncher<Uri> takePictureLauncher;
 
-
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     noteId = DetailsFragmentArgs.fromBundle(getArguments()).getNoteId();
   }
 
+  /** @noinspection DataFlowIssue*/
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -71,7 +70,6 @@ public class DetailsFragment extends Fragment {
       }
     });
     binding.cancel.setOnClickListener((v) -> {
-      // TODO: 6/18/25 Discard changes, return note field to its original state.
       viewModel.setEditing(false);
     });
     binding.addPhoto.setOnClickListener((v) -> capture());
@@ -92,7 +90,7 @@ public class DetailsFragment extends Fragment {
     } else {
       note = new NoteWithImages();
       handleNote(note);
-      // TODO: 6/23/25 Invoke method in viewModel to clear images.
+      viewModel.clearImages(); // DONE: 6/23/25 Invoke method in viewModel to clear images.
       viewModel.setEditing(true);
     }
     viewModel
@@ -106,7 +104,7 @@ public class DetailsFragment extends Fragment {
         .observe(owner, this::handleVisibilityFlags);
     requestCameraPermissionLauncher = registerForActivityResult(
         new ActivityResultContracts.RequestPermission(),
-        viewModel::setCameraPermission);       // DONE: 6/17/25 Make camera capture control GONE!          // DONE: 6/17/25 Make camera capture control visible.
+        viewModel::setCameraPermission);       // DONE: 6/17/25 Make camera capture control GONE!          // DONE: 6/17/25 Make the camera capture control visible.
     takePictureLauncher = registerForActivityResult(new TakePicture(), viewModel::confirmCapture); // method reference ok here bc we know viewModel won't be null; intellij doesn't know this
     checkCameraPermission();
   }
@@ -131,8 +129,7 @@ public class DetailsFragment extends Fragment {
 
   private void handleNote(NoteWithImages note) {
     this.note = note;
-    noteId = note.getId();
-    // DONE: 6/17/25 Set contents of view widgets based on note.
+    noteId = note.getId();     // DONE: 6/17/25 Set contents of view widgets based on note.
     binding.titleStatic.setText(note.getTitle());
     binding.titleEditable.setText(note.getTitle());
     binding.descriptionStatic.setText(note.getDescription());
@@ -148,8 +145,7 @@ public class DetailsFragment extends Fragment {
   private void checkCameraPermission() {
     if (!hasCameraPermission()) {
       if (shouldExplainCameraPermission()) {
-        // DONE: 6/17/25 Display dialog fragment (or snackbar) with text explaining use of camera by app.
-        explainCameraPermission();
+        explainCameraPermission();         // DONE: 6/17/25 Display dialog fragment (or snackbar) with text explaining use of camera by app.
       } else {
         requestCameraPermission();
       }
