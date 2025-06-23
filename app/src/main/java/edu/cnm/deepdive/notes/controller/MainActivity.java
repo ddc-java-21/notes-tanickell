@@ -1,11 +1,7 @@
 package edu.cnm.deepdive.notes.controller;
 
 import android.os.Bundle;
-
-import android.util.Log;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -13,10 +9,6 @@ import androidx.navigation.ui.NavigationUI;
 import dagger.hilt.android.AndroidEntryPoint;
 import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.databinding.ActivityMainBinding;
-import edu.cnm.deepdive.notes.service.dao.UserDao;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
@@ -45,15 +37,12 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void setupNavigation() {
-    appBarConfig = new AppBarConfiguration.Builder(R.id.list_fragment)
+    appBarConfig = new AppBarConfiguration.Builder(
+        R.id.pre_login_fragment, R.id.login_fragment, R.id.list_fragment)
         .build();
     NavHostFragment host = binding.navHostFragment.getFragment();
-    navController = host.getNavController();
-//    navController =
-//        ((NavHostFragment) binding.navHostFragment.getFragment()).getNavController();     // reference to the piece of machinery that will swap in one fragment for another
+    navController = host.getNavController(); // reference to the piece of machinery that will swap in one fragment for another
     NavigationUI.setupActionBarWithNavController(this, navController, appBarConfig);
   }
-
-
 
 }

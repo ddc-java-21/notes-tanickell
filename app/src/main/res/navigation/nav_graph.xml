@@ -1,9 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+  xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/nav_graph"
-  app:startDestination="@id/list_fragment">
+  app:startDestination="@id/pre_login_fragment">
+
+  <fragment
+    android:id="@+id/pre_login_fragment"
+    android:name="edu.cnm.deepdive.notes.controller.PreLoginFragment"
+    tools:layout="@layout/fragment_pre_login">
+
+    <action
+      android:id="@+id/show_login"
+      app:destination="@id/login_fragment"
+      app:popUpTo="@id/nav_graph"/>
+
+    <action
+      android:id="@+id/show_list"
+      app:destination="@id/list_fragment"
+      app:popUpTo="@id/nav_graph"/>
+
+  </fragment>
+
+  <fragment
+    android:id="@+id/login_fragment"
+    android:name="edu.cnm.deepdive.notes.controller.LoginFragment"
+    android:label="@string/login_fragment_label"
+    tools:layout="@layout/fragment_login">
+
+    <action
+      android:id="@+id/show_list"
+      app:destination="@id/list_fragment"
+      app:popUpTo="@id/nav_graph"/>
+
+  </fragment>
 
   <fragment
     android:id="@+id/list_fragment"
@@ -21,6 +52,11 @@
 
     </action>
 
+    <action
+      android:id="@+id/show_pre_login"
+      app:destination="@id/pre_login_fragment"
+      app:popUpTo="@id/nav_graph"/>
+
   </fragment>
 
   <fragment
@@ -35,5 +71,4 @@
 
   </fragment>
 
-  <!--  TODO Add silent sign in, sign in, note detail, and any other required fragments and actions.-->
 </navigation>

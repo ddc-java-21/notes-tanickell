@@ -19,6 +19,7 @@ import androidx.navigation.Navigation;
 import dagger.hilt.android.AndroidEntryPoint;
 import edu.cnm.deepdive.notes.databinding.FragmentListBinding;
 import edu.cnm.deepdive.notes.view.adapter.NoteAdapter;
+import edu.cnm.deepdive.notes.viewmodel.LoginViewModel;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel;
 import javax.inject.Inject;
 
@@ -51,11 +52,19 @@ public class ListFragment extends Fragment implements MenuProvider {
     FragmentActivity activity = requireActivity();
     ViewModelProvider provider = new ViewModelProvider(activity);
     LifecycleOwner owner = getViewLifecycleOwner();
-    viewModel = provider.get(NoteViewModel.class); // DONE: 6/16/25 Get and observe LiveData in viewmodels, with observers that update the UI.
+    viewModel = provider.get(NoteViewModel.class); // DONE: 6/16/25 Get and observe LiveData in view models, with observers that update the UI.
     viewModel
         .getNotes()
         .observe(owner, adapter::setNotes);
-    //        .observe(owner, (notes) -> adapter.setNotes(notes));
+    LoginViewModel loginViewModel = provider.get(LoginViewModel.class);
+    loginViewModel
+        .getAccount()
+            .observe(owner, (account) -> {
+              if (account == null) { // iow, if the user has signed out
+                Navigation.findNavController(binding.getRoot())
+                    .navigate(ListFragmentDirections.showPreLogin());
+              }
+            });
     activity.addMenuProvider(this, owner, State.RESUMED);
   }
 
