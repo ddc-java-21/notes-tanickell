@@ -26,6 +26,14 @@ plugins {
     alias(libs.plugins.junit)
 }
 
+// TODO: Add allprojects section containing google maven repository.
+//allprojects {
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
+//}
+
 android {
 
     namespace = project.property("basePackageName") as String?
@@ -148,6 +156,9 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     androidTestAnnotationProcessor(libs.hilt.compiler)
     androidTestAnnotationProcessor(libs.hilt.android.compiler)
+
+    // TODO: Add Google Maven dependency to dependencies.
+//    implementation("com.google.android.material:material:<version>")
 
     constraints {
         implementation(libs.kotlin.jdk7) {

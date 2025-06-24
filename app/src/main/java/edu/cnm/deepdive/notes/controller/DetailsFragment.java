@@ -32,6 +32,11 @@ import java.util.UUID;
 
 public class DetailsFragment extends Fragment {
 
+  // TODO: 6/24/25 Make DetailsFragment class extend MenuProvider 
+  // TODO: 6/24/25 Override onCreateMenu and onMenuItemSelected in DetailsFragment.
+  // TODO: 6/24/25 Add field for topAppBar and instantiate.
+  // TODO: 6/24/25 Call setNavigationOnClickListener and setOnMenuItemClickListener in a method.
+
   /** @noinspection unused*/
   private static final String TAG = DetailsFragment.class.getSimpleName();
   private static final String AUTHORITY = ImageFileProvider.class.getName().toLowerCase();   // DONE: 6/18/25 Use our provider to get the authority.

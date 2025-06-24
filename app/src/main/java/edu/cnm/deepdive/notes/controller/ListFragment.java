@@ -27,6 +27,10 @@ import javax.inject.Inject;
 @AndroidEntryPoint
 public class ListFragment extends Fragment implements MenuProvider {
 
+  // TODO: 6/24/25 Override onCreateMenu and onMenuItemSelected in ListFragment.
+  // TODO: 6/24/25 Add field for topAppBar and instantiate. 
+  // TODO: 6/24/25 Call setNavigationOnClickListener and setOnMenuItemClickListener in a method.
+
   @Inject
   NoteAdapter adapter;
 

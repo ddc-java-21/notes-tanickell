@@ -27,3 +27,21 @@
     app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--TODO: Convert ConstraintLayout to CoordinatorLayout in fragment_list-->
+<!--TODO: Add AppBarLayout, MaterialToolbar, and NestedScrollView widgets-->
+<!--TODO: Add new file top_app_bar.xml-->
+<!--TODO: Add ?attr/colorControlNormal to icons in res/drawable folder.-->
+<!--TODO: Create field for and instantiate topAppBar in fragments-->
+<!--TODO: impl. setNavigationOnClickListener and setOnMenuItemClickListener-->
+<!--TODO: Add app:liftOnScrollTargetViewId to id of scrolling view
+     (if scrolling view nested in another view)-->
+<!--TODO: add scrolling behavior to AppBarLayout (app:liftOnScroll="true")-->
+<!--TODO: Optional Scrolling Behaviors (add to MaterialToolbar):-->
+<!--  app:layout_scrollFlags="scroll|enterAlways|snap"-->
+<!--  app:layout_scrollEffect="compress"-->
+<!--TODO: Configure status bar edge-to-edge using:-->
+<!--  android:fitsSystemWindows="true" (in AppBarLayout or MaterialToolbar)-->
+<!--  calling appBarLayout.statusBarForeground or-->
+<!--  ppBarLayout.setStatusBarForegroundColor in code-->
+
